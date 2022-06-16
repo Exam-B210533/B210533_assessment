@@ -7,7 +7,7 @@
 
 #Here is an example of using R as a calculator to perform a numerical operation. 
 
-(30000000 + 70000000)^2 - 1*10/4
+(30000000 + 70000000)^2 - 1*10/400000000
 
 
 # Using the c() and cbind() base R functions to combine data values and objects respectively. 
