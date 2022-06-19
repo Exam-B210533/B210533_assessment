@@ -11,9 +11,9 @@ library(lubridate)
 library(caret)
 library(cowplot)
 
-#---------------------
-# Load NHSRdataset
-#---------------------
+#--------------------------------
+# Load ons_mortality NHSRdataset
+#--------------------------------
 
 data(ons_mortality)
 mort <- ons_mortality
@@ -25,10 +25,23 @@ mort <- ons_mortality
 glimpse(mort)
 head(mort)
 tail(mort)
-unique(mort[c("category_1")])
+unique_cat1 = unique(mort[c("category_1")])
 unique(mort[c("category_2")])
+unique_cat2 = unique(mort[c("category_2")])
+print(unique_cat2, n=42)
 min(mort$date, na.rm = TRUE)
 max(mort$date, na.rm = TRUE)
+
+#-------------------------
+# Look for missing values
+#-------------------------
+
+mort %>% 
+  map(is.na) %>%
+  map(sum)
+
+filter(mort, mort$counts == "NA")
+which(is.na(mort$counts))
 
 #--------------------------------------
 # Create an index column for reference

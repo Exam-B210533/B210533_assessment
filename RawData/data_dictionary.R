@@ -1,6 +1,7 @@
 #---------------------
 # Load packages
 #---------------------
+install.packages("dataMeta")
 library(dataMeta)
 library (tidyverse)
 library(here)
@@ -9,23 +10,14 @@ library(here)
 # Read in the data
 #------------------
 
-CollectedData=read_csv(here("RawData", "CollectedDataFinal.csv"))
+collected_data=read_csv(here("RawData", "collected_data_final.csv"))
 
-CollectedData <- data.frame (
-  index  = c(1798, 1803, 5324, 5326),
-  week_no  = c(30, 35, 19, 21),
-  year  = c(2011, 2011, 2013, 2013), 
-  date   = c(as.Date("2011-07-29"), as.Date("2011-09-02"), as.Date("2013-05-10"), as.Date("2013-05-24")),
-  counts = c (0, 7717, 8814, 9530),
-  mort_avg =   c(8737.4, 7984.6, 9096.0, 9311.2),
-  variance_from_avg = c(0.967794, 0.966485, 0.968997, 1.023499), 
-  consent  = c(TRUE, TRUE, TRUE, TRUE))
 #-----------------
 #Look at the data
 #-----------------
 
-glimpse(CollectedData) 
-tail(CollectedData)
+glimpse(collected_data) 
+tail(collected_data)
 
 #---------------
 # Create Linker
@@ -43,27 +35,27 @@ variable_description <- c("The index column that allows us to link the data coll
 print(variable_description)
 
 # View the data types
-glimpse(CollectedData) 
+glimpse(collected_data) 
 
 # There are six quantitative values variables and two fixed values (allowable values or codes) variables.
-variable_type <- c(0, 0, 0, 0, 0, 0, 0, 1)
+variable_type <- c(0, 0, 0, 1, 0, 0, 0, 1)
 print(variable_type)
 
-linker<-build_linker(CollectedData, variable_description, variable_type)
+linker<-build_linker(collected_data, variable_description, variable_type)
 print(linker)
 
 #---------------------
 # Create Data Dictionary 
 #---------------------
 
-dictionary <- build_dict(my.data = CollectedData, linker = linker)
+dictionary <- build_dict(my.data = collected_data, linker = linker)
 glimpse(dictionary)
 
 #---------------------
 # Save Data Dictionary 
 #---------------------
 
-write_csv(dictionary, here("RawData", "CollectedData_DataDictionary.csv"))
+write_csv(dictionary, here("RawData", "collected_data_dictionary.csv"))
 
 #-----------------------------------
 # Create main_string for attributes
@@ -75,15 +67,15 @@ main_string <- "This data describes the NHS England Mortality data and running 5
 # Incorporate attributes as metada
 #----------------------------------
 
-complete_CollectedData <- incorporate_attr(my.data = CollectedData, data.dictionary = dictionary,
+complete_collected_data <- incorporate_attr(my.data = collected_data, data.dictionary = dictionary,
                                            main_string = main_string)
 #Change the author name
-attributes(complete_CollectedData)$author[1]<-"Shona McElroy"
-complete_CollectedData
-attributes(complete_CollectedData)
+attributes(complete_collected_data)$author[1]<-"Shona McElroy"
+complete_collected_data
+attributes(complete_collected_data)
 
 #----------------------------------------
-# Save the CollectedData with attributes
+# Save the complete_collected_data with attributes
 #----------------------------------------
 
-save_it(complete_CollectedData, here("RawData", "complete_CollectedData"))
+save_it(complete_collected_data, here("RawData", "complete_collected_data"))
