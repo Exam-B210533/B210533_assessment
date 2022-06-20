@@ -208,7 +208,14 @@ class(mort)</code></pre>
 ## $ date       &lt;date&gt; 2010-01-08, 2010-01-15, 2010-01-22, 2010-01-29, 2010-02-05…
 ## $ week_no    &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, …</code></pre>
 <p>The data is a table data frame with 18,803 rows of data and 5 columns. The Category 1 and Category 2 columns have multiple different character values and these should be examined to see the unique values in the set.</p>
-<p>The data contains: * category_1: character, containing the names of the groups for counts, e.g. “Total deaths”, “all ages”. * category_2: character, subcategory of names of groups where necessary, e.g. details of region: “East”, details of age bands “15-44”. * counts: integer, actual number of deaths in whole numbers. * date: date, format is yyyy-mm-dd; all dates are a Friday. * week_no: integer, each week in a year is numbered sequentially.</p>
+<p>The data contains:</p>
+<ul>
+<li><strong>category_1</strong>: character, containing the names of the groups for counts, e.g. “Total deaths”, “all ages”.</li>
+<li><strong>category_2</strong>: character, subcategory of names of groups where necessary, e.g. details of region: “East”, details of age bands “15-44”.</li>
+<li><strong>counts</strong>: integer, actual number of deaths in whole numbers.</li>
+<li><strong>date</strong>: date, format is yyyy-mm-dd; all dates are a Friday.</li>
+<li><strong>week_no</strong>: integer, each week in a year is numbered sequentially.</li>
+</ul>
 <div id="unique-categories" class="section level3">
 <h3>Unique Categories</h3>
 <p>Two columns have character data with category data. To find the unique values for these columns the unique() function is used:</p>
@@ -597,7 +604,7 @@ glimpse(mort_all)</code></pre>
 </div>
 <div id="build-the-subset-data-frame" class="section level2">
 <h2>Build the subset data frame</h2>
-<p>The data frame for analysis is created. It includes the data objects: * index * week number * year * date * count of deaths * average of previous 5 years * variance between actual count and average.</p>
+<p>The data frame for analysis is created with the needed data.</p>
 <pre class="r"><code>mort_all &lt;- mort_all[, c(&quot;index&quot;, &quot;week_no&quot;, &quot;year&quot;, &quot;date&quot;, &quot;counts&quot;, &quot;mort_avg&quot;, &quot;variance_from_avg&quot;)]
 head(mort_all)</code></pre>
 <pre><code>## # A tibble: 6 × 7
@@ -963,8 +970,9 @@ nrow(mort_alltest)</code></pre>
 <div id="create-the-data-capture-tool-with-python" class="section level1">
 <h1>Create the data capture tool with Python</h1>
 <p>The data capture tool has been created using Python in Jupyter Notebook. The data is captured using interactive widgets. It has been tested using the test data. The output is saved in the B210533_assessment/RawData folder as collected_data_dictionary.csv.</p>
-<div id="overview" class="section level2">
-<h2>Overview</h2>
+</div>
+<div id="create-a-data-dictionary" class="section level1">
+<h1>Create a data dictionary</h1>
 <p>This data dictionary provides information about data from the ONS Mortality data collected using the The Jupyter Notebook data collection tool saved at “./ipynbScripts/data_collection_tool.ipynb”. The output is saved as an R dataset (.rds) in the ‘RawData’ folder.</p>
 <div id="load-packages" class="section level3">
 <h3>Load packages</h3>
@@ -989,11 +997,18 @@ library(here)</code></pre>
 ## $ mort_avg          &lt;dbl&gt; 8737.4, 7984.6, 9096.0, 9311.2, 9398.8, 8872.2, 9572…
 ## $ variance_from_avg &lt;dbl&gt; 0.967794, 0.966485, 0.968997, 1.023499, 1.056305, 1.…
 ## $ consent           &lt;lgl&gt; TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE…</code></pre>
-<p>The collected_data_final data set contains: * <strong>category_1:</strong> character, containing the names of the groups for counts, e.g. “Total deaths”, “all ages”. * <strong>category_2</strong>: character, subcategory of names of groups where necessary, e.g. details of region: “East”, details of age bands “15-44”. * <strong>counts:</strong> integer, actual number of deaths in whole numbers. * <strong>date:</strong> date, format is yyyy-mm-dd; all dates are a Friday. * <strong>week_no:</strong> integer, each week in a year is numbered sequentially. * <strong>mort_avg</strong> float, average mortality for the 5-years prior to date * <strong>variance_from_avg</strong> float, difference between actual mortality and 5-year average as a proportion * <strong>consent:</strong> the consent from the end-user to process and share the data collected with the data capture tool.</p>
+<p>The collected_data_final data set contains:</p>
+<ul>
+<li><strong>category_1:</strong> character, containing the names of the groups for counts, e.g. “Total deaths”, “all ages”.</li>
+<li><strong>category_2</strong>: character, subcategory of names of groups where necessary, e.g. details of region: “East”, details of age bands “15-44”.</li>
+<li><strong>counts:</strong> integer, actual number of deaths in whole numbers.</li>
+<li><strong>date:</strong> date, format is yyyy-mm-dd; all dates are a Friday.</li>
+<li><strong>week_no:</strong> integer, each week in a year is numbered sequentially.</li>
+<li><strong>mort_avg</strong> float, average mortality for the 5-years prior to date</li>
+<li><strong>variance_from_avg</strong> float, difference between actual mortality and 5-year average as a proportion</li>
+<li><strong>consent:</strong> the consent from the end-user to process and share the data collected with the data capture tool.</li>
+</ul>
 </div>
-</div>
-<div id="build-a-data-dictionary" class="section level2">
-<h2>Build a data dictionary</h2>
 <div id="change-the-date-format-to-character" class="section level3">
 <h3>Change the date format to character</h3>
 <p>The data dictionary functions used below work more effectively with character type data rather than date type data, tehrefore the date column is transformed.</p>
@@ -1027,7 +1042,6 @@ print(variable_type)</code></pre>
 <pre class="r"><code>linker&lt;-build_linker(collected_data_final, variable_description, variable_type)</code></pre>
 </div>
 </div>
-</div>
 <div id="create-the-data-dictionary" class="section level2">
 <h2>Create the data dictionary</h2>
 <p>The build_dict function is used to create a data frame using the linker (and the variable names, variable descriptions and variable types) to create the data dictionary.</p>
@@ -1044,8 +1058,8 @@ glimpse(dictionary)</code></pre>
 <pre class="r"><code>write_csv(dictionary, here(&quot;RawData&quot;, &quot;collected_data_dictionary.csv&quot;))</code></pre>
 </div>
 </div>
-<div id="append-data-dictionary-to-the-collected_data_final" class="section level2">
-<h2>Append data dictionary to the collected_data_final</h2>
+<div id="append-data-dictionary-to-the-collected_data_final-file" class="section level2">
+<h2>Append data dictionary to the collected_data_final file</h2>
 <div id="create-main_string-for-attributes" class="section level3">
 <h3>Create main_string for attributes</h3>
 <p>An introductory description for the data set is created to be added as meta data alongside the data dictionary below.</p>
@@ -1081,7 +1095,7 @@ attributes(complete_collected_data)</code></pre>
 ## )
 ## 
 ## $problems
-## &lt;pointer: 0x55a7831804e0&gt;
+## &lt;pointer: 0x55c181b27ee0&gt;
 ## 
 ## $class
 ## [1] &quot;spec_tbl_df&quot; &quot;tbl_df&quot;      &quot;tbl&quot;         &quot;data.frame&quot; 
@@ -1149,7 +1163,7 @@ attributes(complete_collected_data)</code></pre>
 ## 18        2011 to 2019
 ## 
 ## $last_edit_date
-## [1] &quot;2022-06-20 15:49:26 UTC&quot;
+## [1] &quot;2022-06-20 17:21:05 UTC&quot;
 ## 
 ## $author
 ## [1] &quot;B210533&quot;</code></pre>
