@@ -2,6 +2,7 @@
 #load packages
 #---------------------
 
+# load the packages needed for data preparation and visualisation
 library(NHSRdatasets)
 library(tidyverse)
 library(here)
@@ -15,22 +16,39 @@ library(cowplot)
 # Load ons_mortality NHSRdataset
 #--------------------------------
 
+# The data set is loaded from the NHSRdataset library 
 data(ons_mortality)
 mort <- ons_mortality
+class(mort)
 
 #--------------------------------
 # Look at the ons_mortality data
 #--------------------------------
 
+# Examine the data frame 
 glimpse(mort)
 head(mort)
 tail(mort)
+# Look at the unique values in each of the Catgeory columns
 unique_cat1 = unique(mort[c("category_1")])
-unique(mort[c("category_2")])
+kable(unique_cat1)
 unique_cat2 = unique(mort[c("category_2")])
-print(unique_cat2, n=42)
+kable(unique_cat2)
+# Look at the dates to identify the earliest and latest observations
 min(mort$date, na.rm = TRUE)
 max(mort$date, na.rm = TRUE)
+
+#-------------------------------------------------------
+# Create a four column table to view the category 2 data
+#-------------------------------------------------------
+
+# The Category_2 list is long and would be better presented as four columns side by side
+unique_cat2 = unique(mort[c("category_2")])
+unique_cat2_list <- data.frame(unique_cat2, freq=1:42)
+kable(
+  list(unique_cat2[1:10,], unique_cat2[11:20,],unique_cat2[21:31,],unique_cat2[32:42,]),
+  booktabs = TRUE
+)
 
 #-------------------------
 # Look for missing values
@@ -40,29 +58,24 @@ mort %>%
   map(is.na) %>%
   map(sum)
 
-filter(mort, mort$counts == "NA")
-which(is.na(mort$counts))
-
 #--------------------------------------
 # Create an index column for reference
 #--------------------------------------
 
+# A row of integers is added as a new column using the data frame row number
 mort <- rowid_to_column(mort, "index")
 
 #----------------------------------------
 # Tabulate the raw data and save the file
 #----------------------------------------
 
-mort %>%
-  # Set the period column to show in month-year format
-  mutate_at(vars(date), format, "%b-%y") %>% 
-  # Set the numeric columns to have a comma at the 1000's place
-  mutate_at(vars(counts), comma) %>%
-  # Show the first 10 rows
-  head(10) %>%
-  # Format as a table
-  kable()
+# The kable function is used to create a table formatted for the Markdown document
+kable(head(mort, n = 10), 
+      digits = 3, 
+      format.args = list(big.mark = ","),
+      caption= "ONS England and Wales Mortality Data Full Data Set, 2010 - 2019")
 
+# The data frame is saved to the RawData folder
 write_csv(mort, here("RawData", "ons_mortality.csv"))
 
 #---------------------------------------------------------------------
@@ -73,6 +86,9 @@ write_csv(mort, here("RawData", "ons_mortality.csv"))
 mort_5year_avg <- filter(mort,category_2 == "average of same week over 5 years")
 glimpse(mort_5year_avg)
 tail(mort_5year_avg)
+
+mort_total <- filter(mort,category_1 == "Total deaths" & category_2 == "all ages")
+glimpse(mort_total)
 
 # Average data has 521 observations, while all deaths has 535 observations
 # Last date for 5-year average observation is 27-12-2019, so need to remove "all deaths" observations after this date 
@@ -91,28 +107,30 @@ mort_all$mort_avg = mort_5year_avg$counts
 mort_all$variance_from_avg = mort_all$counts / mort_all$mort_avg
 
 # create a year column to support analysis by week and year
-mort_all$year = year(mort_all$date)
+mort_all$year = as.character(year(mort_all$date))
 
 # create subset of data with relevant data columns
 mort_all <- mort_all[, c("index", "week_no", "year", "date", "counts", "mort_avg", "variance_from_avg")]
 head(mort_all)
 
 #---------------------------------------
+# Check again for missing values
+#---------------------------------------
+
+mort_all %>% 
+  map(is.na) %>%
+  map(sum)
+
+#---------------------------------------
 # Tabulate the subset and save the file
 #---------------------------------------
 
-mort_all %>%
-  # set the numeric columns to have a comma at the 1000's place
-  mutate_at(vars(counts, mort_avg), comma) %>%
-  # reduce decimal places 
-  mutate_at(vars(variance_from_avg), round, 2)  %>%
-  # show the first 10 rows
-  head(10) %>%
-  # format as a table
-  kable(caption= "England Mortality Data and Variance from Average, 2010 - 2019")
+kable(head(mort_all, n = 10), 
+      digits = 3, 
+      format.args = list(big.mark = ","),
+      caption= "Training Data: England and Wales Mortality Data and Variance from Average, 2010 - 2019")
 
 write_csv(mort_all, here("RawData", "ons_mortality_ENG_1019.csv"))
-
 
 #---------------------------------
 # Create subset for training data
@@ -125,8 +143,8 @@ print(prop)
 set.seed(432)
 #Partition the raw data into the test and training data.
 train_index <- createDataPartition(mort_all$index, p = prop, 
-                                  list = FALSE, 
-                                  times = 1)
+                                   list = FALSE, 
+                                   times = 1)
 head(train_index)
 # All records that are in the train_index are assigned to the training data.
 mort_alltrain <- mort_all[ train_index,]
@@ -137,15 +155,10 @@ nrow(mort_alltrain)
 # Tabulate the training data and save the file
 #----------------------------------------------
 
-mort_alltrain %>%
-  # set the numeric columns to have a comma at the 1000's place
-  mutate_at(vars(counts, mort_avg), comma) %>%
-  # reduce decimal places 
-  mutate_at(vars(variance_from_avg), round, 2)  %>%
-  # show the first 10 rows
-  head(10) %>%
-  # format as a table
-  kable(caption= "Training Data: England Mortality Data and Variance from Average, 2010 - 2019")
+kable(head(mort_alltrain, n = 10), 
+      digits = 3, 
+      format.args = list(big.mark = ","),
+      caption= "Training Data: England and Wales Mortality Data and Variance from Average, 2010 - 2019")
 
 write_csv(mort_alltrain, here("Data", "ons_mortality_ENG_1019_training.csv"))
 
@@ -156,20 +169,19 @@ write_csv(mort_alltrain, here("Data", "ons_mortality_ENG_1019_training.csv"))
 # Allocate all records that are not assigned to the training data subset
 mort_alltest  <- mort_all[-train_index,]
 nrow(mort_alltest)
-#There are 12 records in your test data. One row needs to be set aside for use by the assignment markers
-#can test and evaluate your data-capture tool.
+#There are 12 records in the test data. 
+
+#-------------------------------------------
+# Create subset for Marker to test the tool
+#-------------------------------------------
+
+# One row needs to be set aside for use by the assignment markers to test and evaluate your data-capture tool.
 mort_alltestMarker  <- mort_alltest[1,]
 
-# Tabulate the Markers row for testing
-mort_alltestMarker %>%
-  # set the numeric columns to have a comma at the 1000's place
-  mutate_at(vars(counts, mort_avg), comma) %>%
-  # reduce decimal places 
-  mutate_at(vars(variance_from_avg), round, 2)  %>%
-  # show the first 10 rows
-  head(10) %>%
-  # format as a table
-  kable(caption= "Markers Test Data: England Mortality Data and Variance from Average, 2010 - 2019")
+kable(head(mort_alltestMarker, n = 10), 
+      digits = 3, 
+      format.args = list(big.mark = ","),
+      caption= "Markers Test Data: England and Wales Mortality Data and Variance from Average, 2010 - 2019")
 
 write_csv(mort_alltestMarker, here("Data", "ons_mortality_ENG_1019_test_marker.csv"))
 
@@ -180,14 +192,9 @@ write_csv(mort_alltestMarker, here("Data", "ons_mortality_ENG_1019_test_marker.c
 # Remove from the subset the row saved for the Marker
 mort_alltest  <- mort_alltest[2:nrow(mort_alltest),]
 
-mort_alltest %>%
-  # set the numeric columns to have a comma at the 1000's place
-  mutate_at(vars(counts, mort_avg), comma) %>%
-  # reduce decimal places 
-  mutate_at(vars(variance_from_avg), round, 2)  %>%
-  # show the first 10 rows
-  head(10) %>%
-  # format as a table
-  kable(caption= "Test Data: England Mortality Data and Variance from Average, 2010 - 2019")
+kable(head(mort_alltrain, n = 10), 
+      digits = 3, 
+      format.args = list(big.mark = ","),
+      caption= "Test Data: England and Wales Mortality Data and Variance from Average, 2010 - 2019")
 
 write_csv(mort_alltest, here("Data", "ons_mortality_ENG_1019_test.csv"))
