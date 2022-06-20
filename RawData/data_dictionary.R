@@ -1,23 +1,31 @@
 #---------------------
 # Load packages
 #---------------------
-install.packages("dataMeta")
+#install.packages("dataMeta")
 library(dataMeta)
 library (tidyverse)
+library(knitr)
 library(here)
 
 #------------------
 # Read in the data
 #------------------
 
-collected_data=read_csv(here("RawData", "collected_data_final.csv"))
+collected_data_final=read_csv(here("RawData", "collected_data_final.csv"))
 
 #-----------------
 #Look at the data
 #-----------------
 
-glimpse(collected_data) 
-tail(collected_data)
+glimpse(collected_data_final) 
+tail(collected_data_final)
+
+#------------------------------
+#Change the date to a character 
+#------------------------------
+
+collected_data_final$date <- as.character(collected_data_final$date)
+
 
 #---------------
 # Create Linker
@@ -35,20 +43,20 @@ variable_description <- c("The index column that allows us to link the data coll
 print(variable_description)
 
 # View the data types
-glimpse(collected_data) 
+glimpse(collected_data_final) 
 
 # There are six quantitative values variables and two fixed values (allowable values or codes) variables.
 variable_type <- c(0, 0, 0, 1, 0, 0, 0, 1)
 print(variable_type)
 
-linker<-build_linker(collected_data, variable_description, variable_type)
+linker<-build_linker(collected_data_final, variable_description, variable_type)
 print(linker)
 
 #---------------------
 # Create Data Dictionary 
 #---------------------
 
-dictionary <- build_dict(my.data = collected_data, linker = linker)
+dictionary <- build_dict(my.data = collected_data_final, linker = linker, option_description = NULL, prompt_varopts = FALSE)
 glimpse(dictionary)
 
 #---------------------
@@ -67,15 +75,23 @@ main_string <- "This data describes the NHS England Mortality data and running 5
 # Incorporate attributes as metada
 #----------------------------------
 
-complete_collected_data <- incorporate_attr(my.data = collected_data, data.dictionary = dictionary,
+complete_collected_data <- incorporate_attr(my.data = collected_data_final, data.dictionary = dictionary,
                                            main_string = main_string)
 #Change the author name
-attributes(complete_collected_data)$author[1]<-"Shona McElroy"
+attributes(complete_collected_data)$author[1]<-"B210533"
 complete_collected_data
 attributes(complete_collected_data)
 
-#----------------------------------------
+
+#----------------------------
+# Tabulate the data dictionary
+#---------------------------
+
+kable(dictionary, 
+      caption= "Data Dictionary")
+
+#--------------------------------------------------
 # Save the complete_collected_data with attributes
-#----------------------------------------
+#--------------------------------------------------
 
 save_it(complete_collected_data, here("RawData", "complete_collected_data"))

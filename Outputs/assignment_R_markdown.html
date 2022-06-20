@@ -166,28 +166,24 @@ pre code {
 
 <h1 class="title toc-ignore">B210533_assessment_R_markdown_file</h1>
 <h4 class="author">B210533</h4>
-<h4 class="date">19/06/2022</h4>
+<h4 class="date">20 June, 2022</h4>
 
 </div>
 
 
 <div id="working-with-data-types-and-structures-in-python-and-r" class="section level1">
 <h1>Working with data types and structures in Python and R</h1>
-<div id="introduction" class="section level2">
-<h2>Introduction</h2>
-<p>This is a project created as for the Working with data types and structures in Python and R (2021-2022)[FLEX] course at University of Edinburgh. Prepared and submitted in June 2022.</p>
-</div>
-<div id="github-repository" class="section level2">
-<h2>Github repository</h2>
-<p>The data, code and analysis for this project can be accessed at: <a href="https://github.com/Exam-B210533/B210533_assessment" class="uri">https://github.com/Exam-B210533/B210533_assessment</a></p>
+<div id="introduction" class="section level3">
+<h3>Introduction</h3>
+<p>This is a project created as for the Working with Data Types and Structures in Python and R (2021-2022)[FLEX] course at University of Edinburgh. Prepared and submitted in June 2022. The data, code and analysis for this project can be accessed at: <a href="https://github.com/Exam-B210533/B210533_assessment" class="uri">https://github.com/Exam-B210533/B210533_assessment</a></p>
 </div>
 </div>
 <div id="loading-nhsrdatasets" class="section level1">
 <h1>Loading NHSRdatasets</h1>
-<p>The data used in this project is from the NHSRdatasets package. This package has been created to support skills development in the NHS-R community and contains several free datasets. The dataset I have chosen is from the NHSRdatasets package and is a provisional record of deaths registered weekly in England and Wales from January 2010 to end of March 2020. It is contained in the ons_mortality dataset.</p>
-<p>All of the variables in the dataset were needed for my data capture tool, including categorisations (category 1 and category 2), counts, date and week number, and the data was subsetted into test and training data. The Jupyter Notebook “./ipynbScripts/CollectingDataUsingInteractiveJupyterWidgets.ipynb” was used to to collect the data.</p>
-<div id="load-packages-and-data" class="section level2">
-<h2>Load packages and data</h2>
+<p>The data used in this project is from the NHSRdatasets package. This package has been created to support skills development in the NHS-R community and contains several free datasets. The ons_mortality dataset has been used and contains a provisional record of deaths registered weekly in England and Wales from January 2010 to end of March 2020.</p>
+<p>All of the variables in the dataset are needed including categorisations (category 1 and category 2), counts, date and week number, and the data was subsetted into test and training data. The Jupyter Notebook “./ipynbScripts/data_collection_tool.ipynb” was used to to collect the data.</p>
+<div id="load-packages-and-data" class="section level3">
+<h3>Load packages and data</h3>
 <p>Load the packages and data needed for this script.</p>
 <pre class="r"><code>library(NHSRdatasets)
 library(tidyverse)
@@ -211,212 +207,326 @@ class(mort)</code></pre>
 ## $ counts     &lt;dbl&gt; 12968, 12541, 11762, 11056, 10524, 10117, 10102, 10295, 998…
 ## $ date       &lt;date&gt; 2010-01-08, 2010-01-15, 2010-01-22, 2010-01-29, 2010-02-05…
 ## $ week_no    &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, …</code></pre>
-<p>This is the output of the `glimpse()’ function. It starts off with the number of rows and columns and each column in separate rows. The category 1 and Category 2 columns show character values and this indicates there will be a number of different category entries for these columns.</p>
+<p>The data is a table data frame with 18,803 rows of data and 5 columns. The Category 1 and Category 2 columns have multiple different character values and these should be examined to see the unique values in the set.</p>
+<p>The data contains: * category_1: character, containing the names of the groups for counts, e.g. “Total deaths”, “all ages”. * category_2: character, subcategory of names of groups where necessary, e.g. details of region: “East”, details of age bands “15-44”. * counts: integer, actual number of deaths in whole numbers. * date: date, format is yyyy-mm-dd; all dates are a Friday. * week_no: integer, each week in a year is numbered sequentially.</p>
 <div id="unique-categories" class="section level3">
 <h3>Unique Categories</h3>
-<p>The unique values for these are are follows:</p>
+<p>Two columns have character data with category data. To find the unique values for these columns the unique() function is used:</p>
 <p><strong>Category 1 unique values</strong></p>
-<pre class="r"><code>unique(mort[c(&quot;category_1&quot;)])</code></pre>
-<pre><code>## # A tibble: 9 × 1
-##   category_1                                                                    
-##   &lt;chr&gt;                                                                         
-## 1 Total deaths                                                                  
-## 2 All respiratory diseases (ICD-10 J00-J99) ICD-10                              
-## 3 Persons                                                                       
-## 4 Males                                                                         
-## 5 Females                                                                       
-## 6 Region                                                                        
-## 7 &lt;NA&gt;                                                                          
-## 8 average of same week over 5 years                                             
-## 9 Deaths where COVID-19 was mentioned on the death certificate (ICD-10 U07.1 an…</code></pre>
+<pre class="r"><code>unique_cat1 = unique(mort[c(&quot;category_1&quot;)])
+kable(unique_cat1)</code></pre>
+<table>
+<colgroup>
+<col width="100%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">category_1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Total deaths</td>
+</tr>
+<tr class="even">
+<td align="left">All respiratory diseases (ICD-10 J00-J99) ICD-10</td>
+</tr>
+<tr class="odd">
+<td align="left">Persons</td>
+</tr>
+<tr class="even">
+<td align="left">Males</td>
+</tr>
+<tr class="odd">
+<td align="left">Females</td>
+</tr>
+<tr class="even">
+<td align="left">Region</td>
+</tr>
+<tr class="odd">
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">average of same week over 5 years</td>
+</tr>
+<tr class="odd">
+<td align="left">Deaths where COVID-19 was mentioned on the death certificate (ICD-10 U07.1 and U07.2)</td>
+</tr>
+</tbody>
+</table>
 <p><strong>Category 2 unique values</strong></p>
 <pre class="r"><code>unique_cat2 = unique(mort[c(&quot;category_2&quot;)])
-print(unique_cat2, n=42)</code></pre>
-<pre><code>## # A tibble: 42 × 1
-##    category_2                       
-##    &lt;chr&gt;                            
-##  1 all ages                         
-##  2 average of same week over 5 years
-##  3 v 2001                           
-##  4 Under 1 year                     
-##  5 01-14                            
-##  6 15-44                            
-##  7 45-64                            
-##  8 65-74                            
-##  9 75-84                            
-## 10 85+                              
-## 11 North East                       
-## 12 North West                       
-## 13 Yorkshire and The Humber         
-## 14 East Midlands                    
-## 15 West Midlands                    
-## 16 East                             
-## 17 London                           
-## 18 South East                       
-## 19 South West                       
-## 20 Wales                            
-## 21 v 2010                           
-## 22 v 2013 (IRIS)                    
-## 23 &lt;NA&gt;                             
-## 24 1-4                              
-## 25 5-9                              
-## 26 10-14                            
-## 27 15-19                            
-## 28 20-24                            
-## 29 25-29                            
-## 30 30-34                            
-## 31 35-39                            
-## 32 40-44                            
-## 33 45-49                            
-## 34 50-54                            
-## 35 55-59                            
-## 36 60-64                            
-## 37 65-69                            
-## 38 70-74                            
-## 39 75-79                            
-## 40 80-84                            
-## 41 85-89                            
-## 42 90+</code></pre>
-<p>Using these unique values its possible to see that the dataset contains:</p>
-<ul>
-<li><strong>category_1:</strong> character, containing the names of the groups for counts, e.g. “Total deaths”, “all ages”.
-<ul>
-<li>Total deaths<br />
-</li>
-<li>All respiratory diseases (ICD-10 J00-J99) ICD-10<br />
-</li>
-<li>Persons<br />
-</li>
-<li>Males<br />
-</li>
-<li>Females<br />
-</li>
-<li>Region<br />
-</li>
-<li>NA<br />
-</li>
-<li>average of same week over 5 years<br />
-</li>
-<li>Deaths where COVID-19 was mentioned on the death certificate (ICD-10 U07.1 and U07.2)</li>
-</ul></li>
-<li><strong>category_2</strong>: character, subcategory of names of groups where necessary, e.g. details of region: “East”, details of age bands “15-44”. Can be:
-<ul>
-<li>all ages<br />
-</li>
-<li>average of same week over 5 years</li>
-<li>v2001<br />
-</li>
-<li>v2010</li>
-<li>v2013</li>
-<li>NA</li>
-<li>Under 1 year<br />
-</li>
-<li>01-14<br />
-</li>
-<li>15-44<br />
-</li>
-<li>45-64<br />
-</li>
-<li>65-74<br />
-</li>
-<li>75-84<br />
-</li>
-<li>85+</li>
-<li>North East</li>
-<li>North West</li>
-<li>Yorkshire</li>
-<li>East Midlands</li>
-<li>West Midlands</li>
-<li>East</li>
-<li>London</li>
-<li>South East</li>
-<li>South West</li>
-<li>Wales</li>
-<li>1-4</li>
-<li>5-9</li>
-<li>10-14</li>
-<li>15-19</li>
-<li>20-24</li>
-<li>25-29</li>
-<li>30-34</li>
-<li>35-39</li>
-<li>40-44</li>
-<li>45-49</li>
-<li>50-54</li>
-<li>55-59</li>
-<li>60-64</li>
-<li>65-69</li>
-<li>70-74</li>
-<li>75-79</li>
-<li>80-84</li>
-<li>85-89</li>
-<li>90+</li>
-</ul></li>
-<li><strong>counts:</strong> numeric, numbers of deaths in whole numbers and average numbers with decimal points. To retain the integrity of the format this column data is left as character.</li>
-<li><strong>date:</strong> date, format is yyyy-mm-dd; all dates are a Friday.</li>
-<li><strong>week_no:</strong> integer, each week in a year is numbered sequentially.</li>
-<li><strong>performance:</strong> the performance ([1 - breaches]/attendances) calculated for the whole of England.</li>
-<li><strong>consent:</strong> the consent from the end-user to process and share the data collected with the data capture tool.</li>
-</ul>
-<p>The data has been capture for dates between:</p>
+unique_cat2_list &lt;- data.frame(unique_cat2, freq=1:42)
+kable(
+  list(unique_cat2[1:10,], unique_cat2[11:20,],unique_cat2[21:31,],unique_cat2[32:42,]),
+  booktabs = TRUE
+)</code></pre>
+<table class="kable_wrapper">
+<tbody>
+<tr>
+<td>
+<table>
+<thead>
+<tr class="header">
+<th align="left">category_2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">all ages</td>
+</tr>
+<tr class="even">
+<td align="left">average of same week over 5 years</td>
+</tr>
+<tr class="odd">
+<td align="left">v 2001</td>
+</tr>
+<tr class="even">
+<td align="left">Under 1 year</td>
+</tr>
+<tr class="odd">
+<td align="left">01-14</td>
+</tr>
+<tr class="even">
+<td align="left">15-44</td>
+</tr>
+<tr class="odd">
+<td align="left">45-64</td>
+</tr>
+<tr class="even">
+<td align="left">65-74</td>
+</tr>
+<tr class="odd">
+<td align="left">75-84</td>
+</tr>
+<tr class="even">
+<td align="left">85+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td>
+<table>
+<thead>
+<tr class="header">
+<th align="left">category_2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">North East</td>
+</tr>
+<tr class="even">
+<td align="left">North West</td>
+</tr>
+<tr class="odd">
+<td align="left">Yorkshire and The Humber</td>
+</tr>
+<tr class="even">
+<td align="left">East Midlands</td>
+</tr>
+<tr class="odd">
+<td align="left">West Midlands</td>
+</tr>
+<tr class="even">
+<td align="left">East</td>
+</tr>
+<tr class="odd">
+<td align="left">London</td>
+</tr>
+<tr class="even">
+<td align="left">South East</td>
+</tr>
+<tr class="odd">
+<td align="left">South West</td>
+</tr>
+<tr class="even">
+<td align="left">Wales</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td>
+<table>
+<thead>
+<tr class="header">
+<th align="left">category_2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">v 2010</td>
+</tr>
+<tr class="even">
+<td align="left">v 2013 (IRIS)</td>
+</tr>
+<tr class="odd">
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">1-4</td>
+</tr>
+<tr class="odd">
+<td align="left">5-9</td>
+</tr>
+<tr class="even">
+<td align="left">10-14</td>
+</tr>
+<tr class="odd">
+<td align="left">15-19</td>
+</tr>
+<tr class="even">
+<td align="left">20-24</td>
+</tr>
+<tr class="odd">
+<td align="left">25-29</td>
+</tr>
+<tr class="even">
+<td align="left">30-34</td>
+</tr>
+<tr class="odd">
+<td align="left">35-39</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td>
+<table>
+<thead>
+<tr class="header">
+<th align="left">category_2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">40-44</td>
+</tr>
+<tr class="even">
+<td align="left">45-49</td>
+</tr>
+<tr class="odd">
+<td align="left">50-54</td>
+</tr>
+<tr class="even">
+<td align="left">55-59</td>
+</tr>
+<tr class="odd">
+<td align="left">60-64</td>
+</tr>
+<tr class="even">
+<td align="left">65-69</td>
+</tr>
+<tr class="odd">
+<td align="left">70-74</td>
+</tr>
+<tr class="even">
+<td align="left">75-79</td>
+</tr>
+<tr class="odd">
+<td align="left">80-84</td>
+</tr>
+<tr class="even">
+<td align="left">85-89</td>
+</tr>
+<tr class="odd">
+<td align="left">90+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="date-range" class="section level3">
+<h3>Date Range</h3>
+<p>The dataset contains values for dates between <strong>08-01-2010</strong> and <strong>03-04-2020</strong>:</p>
 <pre class="r"><code>min(mort$date, na.rm = TRUE)</code></pre>
 <pre><code>## [1] &quot;2010-01-08&quot;</code></pre>
-</div>
-<div id="range-of-dates" class="section level3">
-<h3>Range of Dates</h3>
-<p>minimum and</p>
 <pre class="r"><code>max(mort$date, na.rm = TRUE)</code></pre>
 <pre><code>## [1] &quot;2020-04-03&quot;</code></pre>
-<p>maximum</p>
 </div>
-<div id="missing-values" class="section level3">
-<h3>Missing Values</h3>
-<p>The list of unique values for Category 1 and Category 2 shows that they contain NA values. It’s also necessary to examine if other columns contain missing values.</p>
-<pre class="r"><code>mort %&gt;% 
-  map(is.na) %&gt;%
-  map(sum)</code></pre>
-<pre><code>## $category_1
-## [1] 52
-## 
-## $category_2
-## [1] 94
-## 
-## $counts
-## [1] 51
-## 
-## $date
-## [1] 0
-## 
-## $week_no
-## [1] 0</code></pre>
-<p><strong>Counts</strong> also contains missing values. It will be necessary to recheck this once the subset of data has been created to see if these missing values are also present in the subset of data.</p>
-</div>
-</div>
-<div id="add-an-index-to-the-data-set" class="section level2">
-<h2>Add an index to the data set</h2>
-<p>It’s necessary to separate the data into training and testing. The test data will be used to evaluate data collection and analysis tools. A data index column is added to the raw data so that partitioned data sets can be linked back to the raw data if needed in the future.</p>
+<div id="add-an-index-to-the-data-set" class="section level3">
+<h3>Add an index to the data set</h3>
+<p>It’s necessary to separate the data into training and testing data sets. The test data will be used to evaluate the data collection and analysis tools. A data index column is added to the raw data so that partitioned data can be linked back to the raw data if needed in the future.</p>
 <pre class="r"><code>mort &lt;- rowid_to_column(mort, &quot;index&quot;)</code></pre>
 </div>
-<div id="tabulute-the-raw-data" class="section level2">
-<h2>Tabulute the raw data</h2>
-<p>The raw data with index is then tabulated to make the data more readable.</p>
+<div id="tabulate-the-raw-data" class="section level3">
+<h3>Tabulate the raw data</h3>
+<p>The raw data is then tabulated to make the data more readable.</p>
+<pre class="r"><code>kable(head(mort, n = 5), 
+      digits = 3, 
+      format.args = list(big.mark = &quot;,&quot;),
+      caption= &quot;ONS England and Wales Mortality Data Full Data Set, 2010 - 2019&quot;)</code></pre>
+<table>
+<caption>ONS England and Wales Mortality Data Full Data Set, 2010 - 2019</caption>
+<thead>
+<tr class="header">
+<th align="right">index</th>
+<th align="left">category_1</th>
+<th align="left">category_2</th>
+<th align="right">counts</th>
+<th align="left">date</th>
+<th align="right">week_no</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">Total deaths</td>
+<td align="left">all ages</td>
+<td align="right">12,968</td>
+<td align="left">2010-01-08</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="left">Total deaths</td>
+<td align="left">all ages</td>
+<td align="right">12,541</td>
+<td align="left">2010-01-15</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="left">Total deaths</td>
+<td align="left">all ages</td>
+<td align="right">11,762</td>
+<td align="left">2010-01-22</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="left">Total deaths</td>
+<td align="left">all ages</td>
+<td align="right">11,056</td>
+<td align="left">2010-01-29</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="left">Total deaths</td>
+<td align="left">all ages</td>
+<td align="right">10,524</td>
+<td align="left">2010-02-05</td>
+<td align="right">5</td>
+</tr>
+</tbody>
+</table>
 </div>
-<div id="save-the-raw-data-to-the-project" class="section level2">
-<h2>Save the raw data to the project</h2>
+<div id="save-the-raw-data-to-the-project" class="section level3">
+<h3>Save the raw data to the project</h3>
 <p>The raw data is saved to the project folder using the here()) function.</p>
 <pre class="r"><code>write_csv(mort, here(&quot;RawData&quot;, &quot;ons_mortality.csv&quot;))</code></pre>
 </div>
 </div>
-<div id="selecting-variable-for-analysis" class="section level1">
-<h1>Selecting variable for analysis</h1>
-<p>This project does not require all of the data contained in ons__mortality. A subset of the data will be created for use in the project.</p>
-<div id="project-purpose" class="section level2">
-<h2>Project purpose</h2>
-<p>This project will examine the variance between the actual mortality and the 5-year average by season. This will be done for data on Total deaths. A subset of data is needed containing “Total Deaths” for “All Ages” and the “average of same week over 5 years”.</p>
 </div>
-<div id="examine-the-lengths-of-datasets-to-be-mapped" class="section level2">
-<h2>Examine the lengths of datasets to be mapped</h2>
-<p>First, filter() is used to create an object with the “average of the same week over 5 years” data.</p>
+<div id="select-a-subset-of-variables-for-analysis" class="section level1">
+<h1>Select a subset of variables for analysis</h1>
+<p>This project does not require all of the data contained in ons__mortality. A subset of the data will be created for use in the project. This project will examine the variance between the actual mortality and the 5-year average by season. This will be done for data on Total deaths. A subset of data is needed containing “Total Deaths” for “All Ages” and the “average of same week over 5 years”.</p>
+<div id="examine-the-data-to-be-combined" class="section level3">
+<h3>Examine the data to be combined</h3>
+<p>First, filter() is used to create an object with the “average of the same week over 5 years” data and view the result.</p>
 <pre class="r"><code>mort_5year_avg &lt;- filter(mort,category_2 == &quot;average of same week over 5 years&quot;)
 glimpse(mort_5year_avg)</code></pre>
 <pre><code>## Rows: 521
@@ -437,7 +547,7 @@ glimpse(mort_5year_avg)</code></pre>
 ## 4 16101 Total deaths average of same week over 5 years  10622 2019-12-13      50
 ## 5 16102 Total deaths average of same week over 5 years  11499 2019-12-20      51
 ## 6 16103 Total deaths average of same week over 5 years   8014 2019-12-27      52</code></pre>
-<p>There are <strong>521 rows</strong> of data. The records exist only for Category 1 “Total Deaths” and run from Week 1 (08/01/2010) to Week 52 (27/12/2019). Next, the filter() function is used to create an object with only “Total deaths” and “all ages” to examine the length and dates of Total deaths and all ages data.</p>
+<p>There are <strong>521 rows</strong> of data. All rows are Category 1 “Total Deaths” and run from Week 1 (08/01/2010) to Week 52 (27/12/2019). Next, the filter() function is used to create an object with only “Total deaths” and “all ages” to examine the length and dates of Total deaths and all ages data.</p>
 <pre class="r"><code>mort_total &lt;- filter(mort,category_1 == &quot;Total deaths&quot; &amp; category_2 == &quot;all ages&quot;)
 glimpse(mort_total)</code></pre>
 <pre><code>## Rows: 535
@@ -448,6 +558,16 @@ glimpse(mort_total)</code></pre>
 ## $ counts     &lt;dbl&gt; 12968, 12541, 11762, 11056, 10524, 10117, 10102, 10295, 998…
 ## $ date       &lt;date&gt; 2010-01-08, 2010-01-15, 2010-01-22, 2010-01-29, 2010-02-05…
 ## $ week_no    &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, …</code></pre>
+<pre class="r"><code>tail(mort_total)</code></pre>
+<pre><code>## # A tibble: 6 × 6
+##   index category_1   category_2 counts date       week_no
+##   &lt;int&gt; &lt;chr&gt;        &lt;chr&gt;       &lt;dbl&gt; &lt;date&gt;       &lt;int&gt;
+## 1 17776 Total deaths all ages    10816 2020-02-28       9
+## 2 17777 Total deaths all ages    10895 2020-03-06      10
+## 3 17778 Total deaths all ages    11019 2020-03-13      11
+## 4 17779 Total deaths all ages    10645 2020-03-20      12
+## 5 17780 Total deaths all ages    11141 2020-03-27      13
+## 6 17781 Total deaths all ages    16387 2020-04-03      14</code></pre>
 <p>The total deaths for all ages has <strong>535 observations</strong> while the average data has <strong>521 observations</strong>. The last date for 5-year average observation is 27-12-2019, so need to remove “all deaths” observations after this date. Now we create a subset of the data for “all deaths” and “all ages” up to and including the last week of December 2019.</p>
 <pre class="r"><code>mort_all &lt;- filter(mort,category_1 == &quot;Total deaths&quot; &amp; category_2 == &quot;all ages&quot; &amp; date &lt; &quot;2019-12-31&quot;)
 glimpse(mort_all)</code></pre>
@@ -460,36 +580,589 @@ glimpse(mort_all)</code></pre>
 ## $ date       &lt;date&gt; 2010-01-08, 2010-01-15, 2010-01-22, 2010-01-29, 2010-02-05…
 ## $ week_no    &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, …</code></pre>
 </div>
-<div id="append-the-5-year-average" class="section level2">
-<h2>Append the 5 year average</h2>
+<div id="append-the-5-year-average" class="section level3">
+<h3>Append the 5 year average</h3>
 <p>The 5 years average data for the relevant dates is appended as a column to the subset of Total deaths for all ages.</p>
 <pre class="r"><code>mort_all$mort_avg = mort_5year_avg$counts</code></pre>
 </div>
-<div id="calculate-the-variance-between-actual-deaths-and-the-5-year-average" class="section level2">
-<h2>Calculate the variance between actual deaths and the 5 year average</h2>
-<p>A column is added with a new variable. The variable is the calculated difference between the actual mortality and the average for the 5 years preceding that date.</p>
+<div id="calculate-the-variance-between-actual-deaths-and-the-5-year-average" class="section level3">
+<h3>Calculate the variance between actual deaths and the 5 year average</h3>
+<p>Another column is added with a new variable with the calculated difference between the actual mortality and the average for the 5 years preceding that date.</p>
 <pre class="r"><code>mort_all$variance_from_avg = mort_all$counts / mort_all$mort_avg</code></pre>
 </div>
-<div id="create-a-year-column" class="section level2">
-<h2>Create a year column</h2>
+<div id="create-a-year-column" class="section level3">
+<h3>Create a year column</h3>
 <p>The data will be examined and plotted using the week and year for the observation. For this purpose it is helpful to have a year variable based on the date for the same observation.</p>
-<pre class="r"><code>mort_all$year = year(mort_all$date)</code></pre>
+<pre class="r"><code>mort_all$year = as.character(year(mort_all$date))</code></pre>
 </div>
-</div>
-<div id="create-the-subset-data-frame" class="section level1">
-<h1>Create the subset data frame</h1>
-<p>The final data frame for analysis is created with the data objects that have been created.</p>
+<div id="build-the-subset-data-frame" class="section level2">
+<h2>Build the subset data frame</h2>
+<p>The data frame for analysis is created. It includes the data objects: * index * week number * year * date * count of deaths * average of previous 5 years * variance between actual count and average.</p>
 <pre class="r"><code>mort_all &lt;- mort_all[, c(&quot;index&quot;, &quot;week_no&quot;, &quot;year&quot;, &quot;date&quot;, &quot;counts&quot;, &quot;mort_avg&quot;, &quot;variance_from_avg&quot;)]
 head(mort_all)</code></pre>
 <pre><code>## # A tibble: 6 × 7
-##   index week_no  year date       counts mort_avg variance_from_avg
-##   &lt;int&gt;   &lt;int&gt; &lt;dbl&gt; &lt;date&gt;      &lt;dbl&gt;    &lt;dbl&gt;             &lt;dbl&gt;
-## 1     1       1  2010 2010-01-08  12968   12050              1.08 
-## 2     2       2  2010 2010-01-15  12541   12600              0.995
-## 3     3       3  2010 2010-01-22  11762   11692.             1.01 
-## 4     4       4  2010 2010-01-29  11056   11069.             0.999
-## 5     5       5  2010 2010-02-05  10524   10840.             0.971
-## 6     6       6  2010 2010-02-12  10117   10602.             0.954</code></pre>
+##   index week_no year  date       counts mort_avg variance_from_avg
+##   &lt;int&gt;   &lt;int&gt; &lt;chr&gt; &lt;date&gt;      &lt;dbl&gt;    &lt;dbl&gt;             &lt;dbl&gt;
+## 1     1       1 2010  2010-01-08  12968   12050              1.08 
+## 2     2       2 2010  2010-01-15  12541   12600              0.995
+## 3     3       3 2010  2010-01-22  11762   11692.             1.01 
+## 4     4       4 2010  2010-01-29  11056   11069.             0.999
+## 5     5       5 2010  2010-02-05  10524   10840.             0.971
+## 6     6       6 2010  2010-02-12  10117   10602.             0.954</code></pre>
+<div id="check-for-missing-values" class="section level3">
+<h3>Check for missing values</h3>
+<p>There were NA values in the count column when the raw data was examined so its prudent to check again to see if the subset is complete or whether null values need to be managed.</p>
+<pre class="r"><code>mort_all %&gt;% 
+  map(is.na) %&gt;%
+  map(sum)</code></pre>
+<pre><code>## $index
+## [1] 0
+## 
+## $week_no
+## [1] 0
+## 
+## $year
+## [1] 0
+## 
+## $date
+## [1] 0
+## 
+## $counts
+## [1] 0
+## 
+## $mort_avg
+## [1] 0
+## 
+## $variance_from_avg
+## [1] 0</code></pre>
+<p>There are no missing values and so we can proceed with analysis.</p>
+</div>
+<div id="tabulate-the-subset" class="section level3">
+<h3>Tabulate the subset</h3>
+<p>The subset data is tabulated to make the data more readable.</p>
+<pre class="r"><code>kable(head(mort_all, n = 5), 
+      digits = 3, 
+      format.args = list(big.mark = &quot;,&quot;),
+      caption= &quot;England and Wales Mortality Data with Variance from Average, 2010 - 2019&quot;)</code></pre>
+<table>
+<caption>England and Wales Mortality Data with Variance from Average, 2010 - 2019</caption>
+<thead>
+<tr class="header">
+<th align="right">index</th>
+<th align="right">week_no</th>
+<th align="left">year</th>
+<th align="left">date</th>
+<th align="right">counts</th>
+<th align="right">mort_avg</th>
+<th align="right">variance_from_avg</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">2010</td>
+<td align="left">2010-01-08</td>
+<td align="right">12,968</td>
+<td align="right">12,050.0</td>
+<td align="right">1.076</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="left">2010</td>
+<td align="left">2010-01-15</td>
+<td align="right">12,541</td>
+<td align="right">12,600.0</td>
+<td align="right">0.995</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="left">2010</td>
+<td align="left">2010-01-22</td>
+<td align="right">11,762</td>
+<td align="right">11,692.2</td>
+<td align="right">1.006</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">4</td>
+<td align="left">2010</td>
+<td align="left">2010-01-29</td>
+<td align="right">11,056</td>
+<td align="right">11,069.2</td>
+<td align="right">0.999</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">5</td>
+<td align="left">2010</td>
+<td align="left">2010-02-05</td>
+<td align="right">10,524</td>
+<td align="right">10,840.4</td>
+<td align="right">0.971</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="save-the-subset-to-the-project" class="section level3">
+<h3>Save the subset to the project</h3>
+<p>The subset of data is saved to the project folder using the here()) function.</p>
+<pre class="r"><code>write_csv(mort_all, here(&quot;RawData&quot;, &quot;ons_mortality_ENG_1019.csv&quot;))</code></pre>
+</div>
+</div>
+</div>
+<div id="create-test-and-training-subsets" class="section level1">
+<h1>Create test and training subsets</h1>
+<p>A subset of the data is needed to use in evaluating the data capture tool.</p>
+<div id="calculate-the-proportion-of-the-data-subset-to-use-for-testing-purposes" class="section level3">
+<h3>Calculate the proportion of the data subset to use for testing purposes</h3>
+<pre class="r"><code>prop&lt;-(1-(15/nrow(mort_all)))
+print(prop)</code></pre>
+<pre><code>## [1] 0.9712092</code></pre>
+</div>
+<div id="set-a-seed-to-be-able-to-replicate-the-random-generator-in-future" class="section level3">
+<h3>Set a seed to be able to replicate the random generator in future</h3>
+<p>The ‘set.seed()’ function is a random number generator, which is useful for creating random selections that can be reproduced. This will make sure that every time we run this script, we will partition the raw data into the same test and training data.</p>
+<pre class="r"><code>set.seed(432)</code></pre>
+</div>
+<div id="partition-the-raw-data" class="section level3">
+<h3>Partition the raw data</h3>
+<p>The createDataPartition() function is used to generate an object using the previously identified proportion of index rows. The index object is used to create the training set.</p>
+<pre class="r"><code>train_index &lt;- createDataPartition(mort_all$index, p = prop, 
+                                  list = FALSE, 
+                                  times = 1)
+head(train_index)</code></pre>
+<pre><code>##      Resample1
+## [1,]         1
+## [2,]         2
+## [3,]         3
+## [4,]         4
+## [5,]         5
+## [6,]         6</code></pre>
+</div>
+<div id="training-subset" class="section level2">
+<h2>Training subset</h2>
+<div id="assign-the-training-data-to-a-new-object" class="section level3">
+<h3>Assign the training data to a new object</h3>
+<p>All records in the train_index are assigned to the training data.</p>
+<pre class="r"><code>mort_alltrain &lt;- mort_all[ train_index,]
+nrow(mort_alltrain)</code></pre>
+<pre><code>## [1] 509</code></pre>
+<p>There are 509 records in the training set</p>
+</div>
+<div id="tabulate-the-training-dataset" class="section level3">
+<h3>Tabulate the training dataset</h3>
+<p>The subset data is then tabulated to make the data more readable.</p>
+<pre class="r"><code>kable(head(mort_alltrain, n = 5), 
+      digits = 3, 
+      format.args = list(big.mark = &quot;,&quot;),
+      caption= &quot;Training Data: England and Wales Mortality Data and Variance from Average, 2010 - 2019&quot;)</code></pre>
+<table>
+<caption>Training Data: England and Wales Mortality Data and Variance from Average, 2010 - 2019</caption>
+<thead>
+<tr class="header">
+<th align="right">index</th>
+<th align="right">week_no</th>
+<th align="left">year</th>
+<th align="left">date</th>
+<th align="right">counts</th>
+<th align="right">mort_avg</th>
+<th align="right">variance_from_avg</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">2010</td>
+<td align="left">2010-01-08</td>
+<td align="right">12,968</td>
+<td align="right">12,050.0</td>
+<td align="right">1.076</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="left">2010</td>
+<td align="left">2010-01-15</td>
+<td align="right">12,541</td>
+<td align="right">12,600.0</td>
+<td align="right">0.995</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="left">2010</td>
+<td align="left">2010-01-22</td>
+<td align="right">11,762</td>
+<td align="right">11,692.2</td>
+<td align="right">1.006</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">4</td>
+<td align="left">2010</td>
+<td align="left">2010-01-29</td>
+<td align="right">11,056</td>
+<td align="right">11,069.2</td>
+<td align="right">0.999</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">5</td>
+<td align="left">2010</td>
+<td align="left">2010-02-05</td>
+<td align="right">10,524</td>
+<td align="right">10,840.4</td>
+<td align="right">0.971</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="save-the-raw-data-to-the-project-1" class="section level3">
+<h3>Save the raw data to the project</h3>
+<p>The raw data is saved to the project folder using the here() function.</p>
+<pre class="r"><code>write_csv(mort_alltrain, here(&quot;Data&quot;, &quot;ons_mortality_ENG_1019_training.csv&quot;))</code></pre>
+</div>
+<div id="create-the-test-subset" class="section level3">
+<h3>Create the test subset</h3>
+<p>Allocate to the test subset all records that are not assigned to the training data.</p>
+<pre class="r"><code>mort_alltest  &lt;- mort_all[-train_index,]
+nrow(mort_alltest)</code></pre>
+<pre><code>## [1] 12</code></pre>
+<p>There are 12 records in the test data. One row needs to be set aside for use by the assignment markers to test and evaluate the data-capture tool.</p>
+</div>
+</div>
+<div id="markers-subset" class="section level2">
+<h2>Markers subset</h2>
+<div id="create-the-markers-subset" class="section level3">
+<h3>Create the Markers subset</h3>
+<p>The following code takes the first row of the test subset and saves it to a new object.</p>
+<pre class="r"><code>mort_alltestMarker  &lt;- mort_alltest[1,]</code></pre>
+</div>
+<div id="tabulate-the-markers-subset" class="section level3">
+<h3>Tabulate the Markers subset</h3>
+<p>The subset data is then tabulated to make the data more readable.</p>
+<pre class="r"><code>kable(head(mort_alltestMarker, n = 10), 
+      digits = 3, 
+      format.args = list(big.mark = &quot;,&quot;),
+      caption= &quot;Markers Test Data: England and Wales Mortality Data and Variance from Average, 2010 - 2019&quot;)</code></pre>
+<table>
+<caption>Markers Test Data: England and Wales Mortality Data and Variance from Average, 2010 - 2019</caption>
+<thead>
+<tr class="header">
+<th align="right">index</th>
+<th align="right">week_no</th>
+<th align="left">year</th>
+<th align="left">date</th>
+<th align="right">counts</th>
+<th align="right">mort_avg</th>
+<th align="right">variance_from_avg</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1,792</td>
+<td align="right">24</td>
+<td align="left">2011</td>
+<td align="left">2011-06-17</td>
+<td align="right">8,961</td>
+<td align="right">8,984.8</td>
+<td align="right">0.997</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="save-the-the-markers-subset" class="section level3">
+<h3>Save the the Markers subset</h3>
+<p>The raw data is saved to the project folder using the here()) function.</p>
+<pre class="r"><code>write_csv(mort_alltestMarker, here(&quot;Data&quot;, &quot;ons_mortality_ENG_1019_test_marker.csv&quot;))</code></pre>
+</div>
+</div>
+<div id="test-subset" class="section level2">
+<h2>Test subset</h2>
+<p>Remove the Markers row from the test set.</p>
+<pre class="r"><code>mort_alltest  &lt;- mort_alltest[2:nrow(mort_alltest),]</code></pre>
+<div id="tabulate-the-test-subset" class="section level3">
+<h3>Tabulate the test subset</h3>
+<p>Tabulate the remaining test subset data.</p>
+<pre class="r"><code>kable(head(mort_alltrain, n = 5), 
+      digits = 3, 
+      format.args = list(big.mark = &quot;,&quot;),
+      caption= &quot;Test Data: England and Wales Mortality Data and Variance from Average, 2010 - 2019&quot;)</code></pre>
+<table>
+<caption>Test Data: England and Wales Mortality Data and Variance from Average, 2010 - 2019</caption>
+<thead>
+<tr class="header">
+<th align="right">index</th>
+<th align="right">week_no</th>
+<th align="left">year</th>
+<th align="left">date</th>
+<th align="right">counts</th>
+<th align="right">mort_avg</th>
+<th align="right">variance_from_avg</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">2010</td>
+<td align="left">2010-01-08</td>
+<td align="right">12,968</td>
+<td align="right">12,050.0</td>
+<td align="right">1.076</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="left">2010</td>
+<td align="left">2010-01-15</td>
+<td align="right">12,541</td>
+<td align="right">12,600.0</td>
+<td align="right">0.995</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="left">2010</td>
+<td align="left">2010-01-22</td>
+<td align="right">11,762</td>
+<td align="right">11,692.2</td>
+<td align="right">1.006</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">4</td>
+<td align="left">2010</td>
+<td align="left">2010-01-29</td>
+<td align="right">11,056</td>
+<td align="right">11,069.2</td>
+<td align="right">0.999</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">5</td>
+<td align="left">2010</td>
+<td align="left">2010-02-05</td>
+<td align="right">10,524</td>
+<td align="right">10,840.4</td>
+<td align="right">0.971</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="save-the-test-subset" class="section level3">
+<h3>Save the test subset</h3>
+<pre class="r"><code>write_csv(mort_alltest, here(&quot;Data&quot;, &quot;ons_mortality_ENG_1019_test.csv&quot;))</code></pre>
+</div>
+</div>
+</div>
+<div id="create-the-data-capture-tool-with-python" class="section level1">
+<h1>Create the data capture tool with Python</h1>
+<p>The data capture tool has been created using Python in Jupyter Notebook. The data is captured using interactive widgets. It has been tested using the test data. The output is saved in the B210533_assessment/RawData folder as collected_data_dictionary.csv.</p>
+<div id="overview" class="section level2">
+<h2>Overview</h2>
+<p>This data dictionary provides information about data from the ONS Mortality data collected using the The Jupyter Notebook data collection tool saved at “./ipynbScripts/data_collection_tool.ipynb”. The output is saved as an R dataset (.rds) in the ‘RawData’ folder.</p>
+<div id="load-packages" class="section level3">
+<h3>Load packages</h3>
+<pre class="r"><code>library(dataMeta)
+library (tidyverse)
+library(here)</code></pre>
+</div>
+<div id="load-the-data" class="section level3">
+<h3>Load the data</h3>
+<pre class="r"><code>collected_data_final=read_csv(here(&quot;RawData&quot;, &quot;collected_data_final.csv&quot;))</code></pre>
+</div>
+<div id="view-the-data" class="section level3">
+<h3>View the data</h3>
+<pre class="r"><code>glimpse(collected_data_final) </code></pre>
+<pre><code>## Rows: 11
+## Columns: 8
+## $ index             &lt;dbl&gt; 1798, 1803, 5324, 5326, 7121, 10722, 10742, 12473, 1…
+## $ week_no           &lt;dbl&gt; 30, 35, 19, 21, 48, 27, 47, 10, 28, 22, 30
+## $ year              &lt;dbl&gt; 2011, 2011, 2013, 2013, 2014, 2016, 2016, 2017, 2018…
+## $ date              &lt;date&gt; 2011-07-29, 2011-09-02, 2013-05-10, 2013-05-24, 2014…
+## $ counts            &lt;dbl&gt; 0, 7717, 8814, 9530, 9928, 9138, 10603, 11077, 9293…
+## $ mort_avg          &lt;dbl&gt; 8737.4, 7984.6, 9096.0, 9311.2, 9398.8, 8872.2, 9572…
+## $ variance_from_avg &lt;dbl&gt; 0.967794, 0.966485, 0.968997, 1.023499, 1.056305, 1.…
+## $ consent           &lt;lgl&gt; TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE…</code></pre>
+<p>The collected_data_final data set contains: * <strong>category_1:</strong> character, containing the names of the groups for counts, e.g. “Total deaths”, “all ages”. * <strong>category_2</strong>: character, subcategory of names of groups where necessary, e.g. details of region: “East”, details of age bands “15-44”. * <strong>counts:</strong> integer, actual number of deaths in whole numbers. * <strong>date:</strong> date, format is yyyy-mm-dd; all dates are a Friday. * <strong>week_no:</strong> integer, each week in a year is numbered sequentially. * <strong>mort_avg</strong> float, average mortality for the 5-years prior to date * <strong>variance_from_avg</strong> float, difference between actual mortality and 5-year average as a proportion * <strong>consent:</strong> the consent from the end-user to process and share the data collected with the data capture tool.</p>
+</div>
+</div>
+<div id="build-a-data-dictionary" class="section level2">
+<h2>Build a data dictionary</h2>
+<div id="change-the-date-format-to-character" class="section level3">
+<h3>Change the date format to character</h3>
+<p>The data dictionary functions used below work more effectively with character type data rather than date type data, tehrefore the date column is transformed.</p>
+<pre class="r"><code>collected_data_final$date &lt;- as.character(collected_data_final$date)</code></pre>
+</div>
+<div id="build-a-linker-data-frame" class="section level3">
+<h3>Build a linker data frame</h3>
+<p>Create two string vectors representing the different variable descriptions and the different variable types.</p>
+<div id="variable-descriptions" class="section level4">
+<h4>Variable Descriptions</h4>
+<p>Create the variable descriptions</p>
+<pre class="r"><code>variable_description &lt;- c(&quot;The index column that allows us to link the data collected to the original ons_mortality data in the &#39;RawData&#39; folder.&quot;,
+                          &quot;The week in the year that this activity relates to, with numbers starting from January.&quot;,
+                          &quot;The year that this activity relates to.&quot;, 
+                          &quot;The date of the Friday of the week that this activity relates to.&quot;, 
+                          &quot;The count of deaths in that week.&quot;,  
+                          &quot;The average count of deaths in the same week using data from the previous 5-years&quot;,
+                          &quot;The difference between the actual deaths in the week compared to the 5-year average as a proportion (double)&quot;,
+                          &quot;The consent from the end-user to process and share the data collected with the data capture tool.&quot;)</code></pre>
+</div>
+<div id="variable-types" class="section level4">
+<h4>Variable Types</h4>
+<p>There are six quantitative values variables and two fixed values (allowable values or codes) variables.</p>
+<pre class="r"><code>variable_type &lt;- c(0, 0, 0, 1, 0, 0, 0, 1)
+print(variable_type)</code></pre>
+<pre><code>## [1] 0 0 0 1 0 0 0 1</code></pre>
+</div>
+<div id="build-the-linker" class="section level4">
+<h4>Build the Linker</h4>
+<p>The collected_data_final variable names, variable_description and variable_type string vectors are brought together in a intermediary (linker) data frame.</p>
+<pre class="r"><code>linker&lt;-build_linker(collected_data_final, variable_description, variable_type)</code></pre>
+</div>
+</div>
+</div>
+<div id="create-the-data-dictionary" class="section level2">
+<h2>Create the data dictionary</h2>
+<p>The build_dict function is used to create a data frame using the linker (and the variable names, variable descriptions and variable types) to create the data dictionary.</p>
+<pre class="r"><code>dictionary &lt;- build_dict(my.data = collected_data_final, linker = linker, option_description = NULL, prompt_varopts = FALSE)
+glimpse(dictionary)</code></pre>
+<pre><code>## Rows: 18
+## Columns: 3
+## $ variable_name        &lt;chr&gt; &quot;consent&quot;, &quot;counts&quot;, &quot;date&quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, …
+## $ variable_description &lt;chr&gt; &quot;The consent from the end-user to process and sha…
+## $ variable_options     &lt;chr&gt; &quot;TRUE&quot;, &quot;0 to 11077&quot;, &quot;2011-07-29&quot;, &quot;2011-09-02&quot;,…</code></pre>
+<div id="save-the-data-dictionary" class="section level3">
+<h3>Save the data dictionary</h3>
+<p>the data is saved to the RawData folder.</p>
+<pre class="r"><code>write_csv(dictionary, here(&quot;RawData&quot;, &quot;collected_data_dictionary.csv&quot;))</code></pre>
+</div>
+</div>
+<div id="append-data-dictionary-to-the-collected_data_final" class="section level2">
+<h2>Append data dictionary to the collected_data_final</h2>
+<div id="create-main_string-for-attributes" class="section level3">
+<h3>Create main_string for attributes</h3>
+<p>An introductory description for the data set is created to be added as meta data alongside the data dictionary below.</p>
+<pre class="r"><code>main_string &lt;- &quot;This data describes the NHS England Mortality data and running 5 years averages from the *NHSRdatasets* package collected by the data capture tool.&quot;
+main_string</code></pre>
+<pre><code>## [1] &quot;This data describes the NHS England Mortality data and running 5 years averages from the *NHSRdatasets* package collected by the data capture tool.&quot;</code></pre>
+</div>
+<div id="incorporate-attributes-as-metada" class="section level3">
+<h3>Incorporate attributes as metada</h3>
+<pre class="r"><code>complete_collected_data &lt;- incorporate_attr(my.data = collected_data_final, data.dictionary = dictionary,
+                                           main_string = main_string)
+#Change the author name
+attributes(complete_collected_data)$author[1]&lt;-&quot;B210533&quot;
+attributes(complete_collected_data)</code></pre>
+<pre><code>## $row.names
+##  [1]  1  2  3  4  5  6  7  8  9 10 11
+## 
+## $names
+## [1] &quot;index&quot;             &quot;week_no&quot;           &quot;year&quot;             
+## [4] &quot;date&quot;              &quot;counts&quot;            &quot;mort_avg&quot;         
+## [7] &quot;variance_from_avg&quot; &quot;consent&quot;          
+## 
+## $spec
+## cols(
+##   index = col_double(),
+##   week_no = col_double(),
+##   year = col_double(),
+##   date = col_date(format = &quot;&quot;),
+##   counts = col_double(),
+##   mort_avg = col_double(),
+##   variance_from_avg = col_double(),
+##   consent = col_logical()
+## )
+## 
+## $problems
+## &lt;pointer: 0x55a7831804e0&gt;
+## 
+## $class
+## [1] &quot;spec_tbl_df&quot; &quot;tbl_df&quot;      &quot;tbl&quot;         &quot;data.frame&quot; 
+## 
+## $main
+## [1] &quot;This data describes the NHS England Mortality data and running 5 years averages from the *NHSRdatasets* package collected by the data capture tool.&quot;
+## 
+## $dictionary
+##        variable_name
+## 1            consent
+## 2             counts
+## 3               date
+## 4                   
+## 5                   
+## 6                   
+## 7                   
+## 8                   
+## 9                   
+## 10                  
+## 11                  
+## 12                  
+## 13                  
+## 14             index
+## 15          mort_avg
+## 16 variance_from_avg
+## 17           week_no
+## 18              year
+##                                                                                                      variable_description
+## 1                       The consent from the end-user to process and share the data collected with the data capture tool.
+## 2                                                                                       The count of deaths in that week.
+## 3                                                       The date of the Friday of the week that this activity relates to.
+## 4                                                                                                                        
+## 5                                                                                                                        
+## 6                                                                                                                        
+## 7                                                                                                                        
+## 8                                                                                                                        
+## 9                                                                                                                        
+## 10                                                                                                                       
+## 11                                                                                                                       
+## 12                                                                                                                       
+## 13                                                                                                                       
+## 14 The index column that allows us to link the data collected to the original ons_mortality data in the &#39;RawData&#39; folder.
+## 15                                      The average count of deaths in the same week using data from the previous 5-years
+## 16           The difference between the actual deaths in the week compared to the 5-year average as a proportion (double)
+## 17                                The week in the year that this activity relates to, with numbers starting from January.
+## 18                                                                                The year that this activity relates to.
+##       variable_options
+## 1                 TRUE
+## 2           0 to 11077
+## 3           2011-07-29
+## 4           2011-09-02
+## 5           2013-05-10
+## 6           2013-05-24
+## 7           2014-11-28
+## 8           2016-07-08
+## 9           2016-11-25
+## 10          2017-03-10
+## 11          2018-07-13
+## 12          2019-05-31
+## 13          2019-07-26
+## 14       1798 to 16029
+## 15     7984.6 to 10816
+## 16 0.966485 to 1.10771
+## 17            10 to 48
+## 18        2011 to 2019
+## 
+## $last_edit_date
+## [1] &quot;2022-06-20 15:49:26 UTC&quot;
+## 
+## $author
+## [1] &quot;B210533&quot;</code></pre>
+</div>
+<div id="save-collected_data_final-with-attributes" class="section level3">
+<h3>Save collected_data_final with attributes</h3>
+<pre class="r"><code>save_it(complete_collected_data, here(&quot;RawData&quot;, &quot;complete_collected_data&quot;))</code></pre>
+<div id="save-rds" class="section level4">
+<h4>Save RDS</h4>
+<pre class="r"><code>complete_collected_data &lt;- readRDS(here(&quot;RawData&quot;, &quot;complete_collected_data.rds&quot;))</code></pre>
+</div>
+</div>
+</div>
 </div>
 
 

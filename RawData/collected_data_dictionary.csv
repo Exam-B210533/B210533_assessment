@@ -1,0 +1,19 @@
+variable_name,variable_description,variable_options
+consent,The consent from the end-user to process and share the data collected with the data capture tool.,TRUE
+counts,The count of deaths in that week.,0 to 11077
+date,The date of the Friday of the week that this activity relates to.,2011-07-29
+ , ,2011-09-02
+ , ,2013-05-10
+ , ,2013-05-24
+ , ,2014-11-28
+ , ,2016-07-08
+ , ,2016-11-25
+ , ,2017-03-10
+ , ,2018-07-13
+ , ,2019-05-31
+ , ,2019-07-26
+index,The index column that allows us to link the data collected to the original ons_mortality data in the 'RawData' folder.,1798 to 16029
+mort_avg,The average count of deaths in the same week using data from the previous 5-years,7984.6 to 10816
+variance_from_avg,The difference between the actual deaths in the week compared to the 5-year average as a proportion (double),0.966485 to 1.10771
+week_no,"The week in the year that this activity relates to, with numbers starting from January.",10 to 48
+year,The year that this activity relates to.,2011 to 2019

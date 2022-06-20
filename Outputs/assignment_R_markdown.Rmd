@@ -1,28 +1,27 @@
 ---
 title: "B210533_assessment_R_markdown_file"
 author: "B210533"
-date: "19/06/2022"
-output: html_document
+date: "`r format (Sys.time (), '%d %B, %Y')`"
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+# Set so that long lines in R will be wrapped:
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=80), tidy=TRUE, echo = TRUE)
 ```
 
 # Working with data types and structures in Python and R
-## Introduction
-This is a project created as for the Working with data types and structures in Python and R (2021-2022)[FLEX] course at University of Edinburgh. Prepared and submitted in June 2022. 
-
-##### Github repository
-The data, code and analysis for this project can be accessed at: 
+### Introduction
+This is a project created as for the Working with Data Types and Structures in Python and R (2021-2022)[FLEX] course at University of Edinburgh. Prepared and submitted in June 2022. The data, code and analysis for this project can be accessed at: 
 https://github.com/Exam-B210533/B210533_assessment 
 
-
-
 # Loading NHSRdatasets
-The data used in this project is from the NHSRdatasets package. This package has been created to support skills development in the NHS-R community and contains several free datasets. The dataset I have chosen is from the NHSRdatasets package and is a provisional record of deaths registered weekly in England and Wales from January 2010 to end of March 2020. It is contained in the ons_mortality dataset. 
+The data used in this project is from the NHSRdatasets package. This package has been created to support skills development in the NHS-R community and contains several free datasets. The ons_mortality dataset has been used and contains a provisional record of deaths registered weekly in England and Wales from January 2010 to end of March 2020.
 
-All of the variables in the dataset were needed for my data capture tool, including categorisations (category 1 and category 2), counts, date and week number, and the data was subsetted into test and training data. The Jupyter Notebook "./ipynbScripts/CollectingDataUsingInteractiveJupyterWidgets.ipynb" was used to to collect the data.
+All of the variables in the dataset are needed including categorisations (category 1 and category 2), counts, date and week number, and the data was subsetted into test and training data. The Jupyter Notebook "./ipynbScripts/data_collection_tool.ipynb" was used to to collect the data.
 
 ### Load packages and data
 Load the packages and data needed for this script.
@@ -43,132 +42,65 @@ mort <- ons_mortality
 class(mort)
 glimpse(mort)
 ```
-This is the output of the `glimpse()’ function. It starts off with the number of rows and columns and each column in separate rows. The Category 1 and Category 2 columns have multiple different character values and these should be examined to see the unique values in the set. 
+The data is a table data frame with 18,803 rows of data and 5 columns. The Category 1 and Category 2 columns have multiple different character values and these should be examined to see the unique values in the set. 
+
+The data contains:
+  * category_1: character, containing the names of the groups for counts, e.g. "Total deaths", "all ages".
+  * category_2: character, subcategory of names of groups where necessary, e.g. details of region: "East", details of age bands "15-44". 
+  * counts: integer, actual number of deaths in whole numbers.
+  * date: date, format is yyyy-mm-dd; all dates are a Friday.
+  * week_no: integer, each week in a year is numbered sequentially.
+
 
 ### Unique Categories
 
-The unique values for these are are follows: 
+Two columns have character data with category data. To find the unique values for these columns the unique() function is used: 
 
 **Category 1 unique values**
 ```{r c,message = FALSE, warning = FALSE}
-unique(mort[c("category_1")])
+unique_cat1 = unique(mort[c("category_1")])
+kable(unique_cat1)
+
 ```
 **Category 2 unique values**
 ```{r d,message = FALSE, warning = FALSE}
 unique_cat2 = unique(mort[c("category_2")])
-print(unique_cat2, n=42)
+unique_cat2_list <- data.frame(unique_cat2, freq=1:42)
+kable(
+  list(unique_cat2[1:10,], unique_cat2[11:20,],unique_cat2[21:31,],unique_cat2[32:42,]),
+  booktabs = TRUE
+)
 ```
-Using these unique values its possible to see that the dataset contains:
 
-  * **category_1:** character, containing the names of the groups for counts, e.g. "Total deaths", "all ages". 
-    + Total deaths                                                                         
-    + All respiratory diseases (ICD-10 J00-J99) ICD-10                                     
-    + Persons                                                                              
-    + Males                                                                                
-    + Females                                                                              
-    + Region                                                                               
-    + NA                                                                                   
-    + average of same week over 5 years                                                    
-    + Deaths where COVID-19 was mentioned on the death certificate (ICD-10 U07.1 and U07.2)
-  * **category_2**: character, subcategory of names of groups where necessary, e.g. details of region: "East", details of age bands "15-44". Can be: 
-    + all ages                         
-    + average of same week over 5 years
-    + v2001       
-    + v2010
-    + v2013
-    + NA
-    + Under 1 year                     
-    + 01-14                            
-    + 15-44                            
-    + 45-64                            
-    + 65-74                            
-    + 75-84                            
-    + 85+ 
-    + North East
-    + North West
-    + Yorkshire
-    + East Midlands
-    + West Midlands
-    + East
-    + London
-    + South East 
-    + South West
-    + Wales
-    + 1-4
-    + 5-9
-    + 10-14
-    + 15-19
-    + 20-24
-    + 25-29
-    + 30-34
-    + 35-39
-    + 40-44
-    + 45-49
-    + 50-54
-    + 55-59
-    + 60-64
-    + 65-69
-    + 70-74
-    + 75-79
-    + 80-84
-    + 85-89
-    + 90+
-  * **counts:** numeric, numbers of deaths in whole numbers and average numbers with decimal points. To retain the integrity of the format this column data is left as character.
-  * **date:** date, format is yyyy-mm-dd; all dates are a Friday.
-  * **week_no:**  integer, each week in a year is numbered sequentially.
-  * **performance:** the performance ([1 - breaches]/attendances) calculated for the whole of England.
-  * **consent:** the consent from the end-user to process and share the data collected with the data capture tool.
+### Date Range
 
-
-### Range of Dates
-
-The dataset contains values for dates between: 
+The dataset contains values for dates between **08-01-2010** and **03-04-2020**: 
 ```{r e,message = FALSE, warning = FALSE}
 min(mort$date, na.rm = TRUE)
-```
-minimum and
-```{r f, message = FALSE, warning = FALSE}
 max(mort$date, na.rm = TRUE)
 ``` 
-maximum
-
-### Missing Values
-
-The list of unique values for Category 1 and Category 2 shows that they contain NA values. It's also necessary to examine if other columns contain missing values. 
-
-```{r g, message = FALSE, warning = FALSE}
-mort %>% 
-  map(is.na) %>%
-  map(sum)
-```
-**counts** also contains missing values. It will be necessary to recheck this once the subset of data has been created to see if these missing values are also present in the subset of data. 
 
 ### Add an index to the data set
 
-It's necessary to separate the data into training and testing dta sets. The test data will be used to evaluate data collection and analysis tools. A data index column is added to the raw data so that partitioned data sets can be linked back to the raw data if needed in the future.
+It's necessary to separate the data into training and testing data sets. The test data will be used to evaluate the data collection and analysis tools. A data index column is added to the raw data so that partitioned data can be linked back to the raw data if needed in the future.
 
 ```{r h, message = FALSE, warning = FALSE}
 mort <- rowid_to_column(mort, "index")
 
 ```
 
-### Tabulute the raw data
+### Tabulate the raw data
 
-The raw data with index is then tabulated to make the data more readable. 
+The raw data is then tabulated to make the data more readable. 
 
 ```{r i, message = FALSE, warning = FALSE}
-mort %>%
-  # Set the period column to show in month-year format
-  mutate_at(vars(date), format, "%b-%y") %>% 
-  # Set the numeric columns to have a comma at the 1000's place
-  mutate_at(vars(counts), comma) %>%
-  # Show the first 10 rows
-  head(10) %>%
-  # Format as a table
-  kable()
+
+kable(head(mort, n = 5), 
+      digits = 3, 
+      format.args = list(big.mark = ","),
+      caption= "ONS England and Wales Mortality Data Full Data Set, 2010 - 2019")
 
 ```
-
 
 ### Save the raw data to the project
 
@@ -179,13 +111,13 @@ write_csv(mort, here("RawData", "ons_mortality.csv"))
 
 ```
 
-# Selecting variable for analysis
+# Select a subset of variables for analysis
 
 This project does not require all of the data contained in ons__mortality. A subset of the data will be created for use in the project. This project will examine the variance between the actual mortality and the 5-year average by season. This will be done for data on Total deaths. A subset of data is needed containing "Total Deaths" for "All Ages" and the "average of same week over 5 years". 
 
-### Examine the lengths of datasets to be mapped
+### Examine the data to be combined
 
-First, filter() is used to create an object with the "average of the same week over 5 years" data.
+First, filter() is used to create an object with the "average of the same week over 5 years" data and view the result. 
 
 ```{r k, message = FALSE, warning = FALSE}
 mort_5year_avg <- filter(mort,category_2 == "average of same week over 5 years")
@@ -193,11 +125,13 @@ glimpse(mort_5year_avg)
 tail(mort_5year_avg)
 ```
 
-There are **521 rows** of data. The records exist only for Category 1 "Total Deaths" and run from Week 1 (08/01/2010) to Week 52 (27/12/2019). Next, the filter() function is used to create an object with only "Total deaths" and "all ages" to examine the length and dates of Total deaths and all ages data. 
+There are **521 rows** of data. All rows are Category 1 "Total Deaths" and run from Week 1 (08/01/2010) to Week 52 (27/12/2019). Next, the filter() function is used to create an object with only "Total deaths" and "all ages" to examine the length and dates of Total deaths and all ages data. 
 
 ```{r l, message = FALSE, warning = FALSE}
 mort_total <- filter(mort,category_1 == "Total deaths" & category_2 == "all ages")
 glimpse(mort_total)
+tail(mort_total)
+
 ```
 
 The total deaths for all ages has **535 observations** while the average data has **521 observations**. The last date for 5-year average observation is 27-12-2019, so need to remove "all deaths" observations after this date. Now we create a subset of the data for "all deaths" and "all ages" up to and including the last week of December 2019.
@@ -207,7 +141,7 @@ mort_all <- filter(mort,category_1 == "Total deaths" & category_2 == "all ages" 
 glimpse(mort_all)
 ```
 
-## Append the 5 year average
+### Append the 5 year average
 
 The 5 years average data for the relevant dates is appended as a column to the subset of Total deaths for all ages.
 
@@ -215,7 +149,7 @@ The 5 years average data for the relevant dates is appended as a column to the s
 mort_all$mort_avg = mort_5year_avg$counts
 ```
 
-## Calculate the variance between actual deaths and the 5 year average
+### Calculate the variance between actual deaths and the 5 year average
 
 Another column is added with a new variable with the calculated difference between the actual mortality and the average for the 5 years preceding that date. 
 
@@ -223,17 +157,18 @@ Another column is added with a new variable with the calculated difference betwe
 mort_all$variance_from_avg = mort_all$counts / mort_all$mort_avg
 ```
 
-## Create a year column
+### Create a year column
 
 The data will be examined and plotted using the week and year for the observation. For this purpose it is helpful to have a year variable based on the date for the same observation. 
 
 ```{r p, message = FALSE, warning = FALSE}
-mort_all$year = year(mort_all$date)
+mort_all$year = as.character(year(mort_all$date))
 ```
 
-# Create the subset data frame
 
-The final data frame for analysis is created. It includes the data objects:
+## Build the subset data frame
+
+The data frame for analysis is created. It includes the data objects:
   * index 
   * week number
   * year 
@@ -247,9 +182,9 @@ mort_all <- mort_all[, c("index", "week_no", "year", "date", "counts", "mort_avg
 head(mort_all)
 ```
 
-## Check again for missing values
+### Check for missing values
 
-There were NA values in teh count column when the raw data was examined. Now its necessary to check again to see if the subset is complete or whether null values need to be managed. 
+There were NA values in the count column when the raw data was examined so its prudent to check again to see if the subset is complete or whether null values need to be managed. 
 
 ```{r r, message = FALSE, warning = FALSE}
 mort_all %>% 
@@ -259,30 +194,25 @@ mort_all %>%
 
 There are no missing values and so we can proceed with analysis. 
 
-# Tabulate the subset 
+### Tabulate the subset 
 
-The subset data is then tabulated to make the data more readable. 
+The subset data is tabulated to make the data more readable. 
 
 ```{r s, message = FALSE, warning = FALSE}
-mort_all %>%
-  # set the numeric columns to have a comma at the 1000's place
-  mutate_at(vars(counts, mort_avg), comma) %>%
-  # reduce decimal places 
-  mutate_at(vars(variance_from_avg), round, 2)  %>%
-  # show the first 10 rows
-  head(10) %>%
-  # format as a table
-  kable(caption= "England Mortality Data and Variance from Average, 2010 - 2019")
-
+kable(head(mort_all, n = 5), 
+      digits = 3, 
+      format.args = list(big.mark = ","),
+      caption= "England and Wales Mortality Data with Variance from Average, 2010 - 2019")
 ```
-# Save the subset to the project
+
+### Save the subset to the project
 The subset of data is saved to the project folder using the here()) function. 
 
 ```{r t, message = FALSE, warning = FALSE}
 write_csv(mort_all, here("RawData", "ons_mortality_ENG_1019.csv"))
 ```
-# Partitian the data 
-A subset of the data is needed for use in evaluation of the data capture tool. 
+# Create test and training subsets
+A subset of the data is needed to use in evaluating the data capture tool. 
 
 ### Calculate the proportion of the data subset to use for testing purposes
 ```{r u, message = FALSE, warning = FALSE}
@@ -290,13 +220,13 @@ prop<-(1-(15/nrow(mort_all)))
 print(prop)
 ```
 ### Set a seed to be able to replicate the random generator in future
-The 'set.seed()' function is a random number generator, which is useful for creating random objects that can be reproduced. This will make sure that every time we run this script, we will partition the raw data into the same test and training data.
+The 'set.seed()' function is a random number generator, which is useful for creating random selections that can be reproduced. This will make sure that every time we run this script, we will partition the raw data into the same test and training data.
 
 ```{r v, message = FALSE, warning = FALSE}
 set.seed(432)
 ```
 ### Partition the raw data 
-The createDataPartition function is used to generate an object using a proportion of index rows. The index object is used to create the training set. 
+The createDataPartition() function is used to generate an object using the previously identified proportion of index rows. The index object is used to create the training set. 
 
 ```{r w, message = FALSE, warning = FALSE}
 train_index <- createDataPartition(mort_all$index, p = prop, 
@@ -304,6 +234,7 @@ train_index <- createDataPartition(mort_all$index, p = prop,
                                   times = 1)
 head(train_index)
 ```
+## Training subset
 ### Assign the training data to a new object
 
 All records in the train_index are assigned to the training data.
@@ -315,30 +246,25 @@ nrow(mort_alltrain)
 There are 509 records in the training set
 
 ### Tabulate the training dataset
+The subset data is then tabulated to make the data more readable.
 
 ```{r y, message = FALSE, warning = FALSE}
-mort_alltrain %>%
-  # set the numeric columns to have a comma at the 1000's place
-  mutate_at(vars(counts, mort_avg), comma) %>%
-  # reduce decimal places 
-  mutate_at(vars(variance_from_avg), round, 2)  %>%
-  # show the first 10 rows
-  head(10) %>%
-  # format as a table
-  kable(caption= "Training Data: England Mortality Data and Variance from Average, 2010 - 2019")
+kable(head(mort_alltrain, n = 5), 
+      digits = 3, 
+      format.args = list(big.mark = ","),
+      caption= "Training Data: England and Wales Mortality Data and Variance from Average, 2010 - 2019")
+
 ```
 
 ### Save the raw data to the project
-
-The raw data is saved to the project folder using the here()) function. 
+The raw data is saved to the project folder using the here() function. 
 
 ```{r z, message = FALSE, warning = FALSE}
 write_csv(mort_alltrain, here("Data", "ons_mortality_ENG_1019_training.csv"))
 ```
 
 ### Create the test subset
-
-Allocate all records that are not assigned to the training data subset
+Allocate to the test subset all records that are not assigned to the training data.
 
 ```{r aa, message = FALSE, warning = FALSE}
 mort_alltest  <- mort_all[-train_index,]
@@ -346,32 +272,157 @@ nrow(mort_alltest)
 ```
 There are 12 records in the test data. One row needs to be set aside for use by the assignment markers to test and evaluate the data-capture tool.
 
-### Create the Markers single-row test subset
+## Markers subset
+### Create the Markers subset
+The following code takes the first row of the test subset and saves it to a new object. 
 
 ```{r ab, message = FALSE, warning = FALSE}
 mort_alltestMarker  <- mort_alltest[1,]
 ```
 
-### Tabulate the Markers row for testing
-
+### Tabulate the Markers subset
 The subset data is then tabulated to make the data more readable. 
 
 ```{r ac, message = FALSE, warning = FALSE}
-mort_alltestMarker %>%
-  # set the numeric columns to have a comma at the 1000's place
-  mutate_at(vars(counts, mort_avg), comma) %>%
-  # reduce decimal places 
-  mutate_at(vars(variance_from_avg), round, 2)  %>%
-  # show the first 10 rows
-  head(10) %>%
-  # format as a table
-  kable(caption= "Markers Test Data: England Mortality Data and Variance from Average, 2010 - 2019")
+kable(head(mort_alltestMarker, n = 10), 
+      digits = 3, 
+      format.args = list(big.mark = ","),
+      caption= "Markers Test Data: England and Wales Mortality Data and Variance from Average, 2010 - 2019")
 ```
-### Save the raw data to the project
+
+### Save the the Markers subset
 
 The raw data is saved to the project folder using the here()) function. 
 
 ```{r ad, message = FALSE, warning = FALSE}
 write_csv(mort_alltestMarker, here("Data", "ons_mortality_ENG_1019_test_marker.csv"))
+```
+
+## Test subset
+Remove the Markers row from the test set.
+```{r ae, message = FALSE, warning = FALSE}
+mort_alltest  <- mort_alltest[2:nrow(mort_alltest),]
+```
+### Tabulate the test subset
+Tabulate the remaining test subset data. 
+```{r af, message = FALSE, warning = FALSE}
+kable(head(mort_alltrain, n = 5), 
+      digits = 3, 
+      format.args = list(big.mark = ","),
+      caption= "Test Data: England and Wales Mortality Data and Variance from Average, 2010 - 2019")
+```
+
+### Save the test subset
+```{r ag, message = FALSE, warning = FALSE}
+write_csv(mort_alltest, here("Data", "ons_mortality_ENG_1019_test.csv"))
+```
+
+# Create the data capture tool with Python
+
+The data capture tool has been created using Python in Jupyter Notebook. The data is captured using interactive widgets. It has been tested using the test data. The output is saved in the B210533_assessment/RawData folder as collected_data_dictionary.csv. 
+
+# Create a data dictionary
+
+This data dictionary provides information about data from the ONS Mortality data collected using the The Jupyter Notebook data collection tool saved at "./ipynbScripts/data_collection_tool.ipynb". The output is saved as an R dataset (.rds) in the 'RawData' folder.
+
+### Load packages
+
+```{r load, message = FALSE, warning=FALSE}
+library(dataMeta)
+library (tidyverse)
+library(here)
+```
+
+### Load the data 
+
+```{r data, message = FALSE, warning=FALSE}
+collected_data_final=read_csv(here("RawData", "collected_data_final.csv"))
+```
+
+### View the data 
+```{r glimpse1, message = FALSE, warning=FALSE}
+glimpse(collected_data_final) 
+```
+The collected_data_final data set contains: 
+  * **category_1:** character, containing the names of the groups for counts, e.g. "Total deaths", "all ages". 
+  * **category_2**: character, subcategory of names of groups where necessary, e.g. details of region: "East", details of age bands "15-44". 
+  * **counts:** integer, actual number of deaths in whole numbers. 
+  * **date:** date, format is yyyy-mm-dd; all dates are a Friday.
+  * **week_no:**  integer, each week in a year is numbered sequentially.
+  * **mort_avg** float, average mortality for the 5-years prior to date
+  * **variance_from_avg** float, difference between actual mortality and 5-year average as a proportion
+  * **consent:** the consent from the end-user to process and share the data collected with the data capture tool.
+
+### Change the date format to character
+The data dictionary functions used below work more effectively with character type data rather than date type data, tehrefore the date column is transformed. 
+```{r dateformat}
+collected_data_final$date <- as.character(collected_data_final$date)
+```
+
+### Build a linker data frame
+Create two string vectors representing the different variable descriptions and the different variable types.
+
+#### Variable Descriptions
+Create the variable descriptions
+```{r variable_description}
+variable_description <- c("The index column that allows us to link the data collected to the original ons_mortality data in the 'RawData' folder.",
+                          "The week in the year that this activity relates to, with numbers starting from January.",
+                          "The year that this activity relates to.", 
+                          "The date of the Friday of the week that this activity relates to.", 
+                          "The count of deaths in that week.",  
+                          "The average count of deaths in the same week using data from the previous 5-years",
+                          "The difference between the actual deaths in the week compared to the 5-year average as a proportion (double)",
+                          "The consent from the end-user to process and share the data collected with the data capture tool.")
+```
+
+#### Variable Types
+There are six quantitative values variables and two fixed values (allowable values or codes) variables.
+```{r variable_types}
+variable_type <- c(0, 0, 0, 1, 0, 0, 0, 1)
+print(variable_type)
+```
+
+#### Build the Linker
+The collected_data_final variable names, variable_description and variable_type string vectors are brought together in a intermediary (linker) data frame. 
+
+```{r build_linker}
+linker<-build_linker(collected_data_final, variable_description, variable_type)
+```
+
+## Create the data dictionary 
+The build_dict function is used to create a data frame using the linker (and the variable names, variable descriptions and variable types) to create the data dictionary. 
+```{r build_dictionary}
+dictionary <- build_dict(my.data = collected_data_final, linker = linker, option_description = NULL, prompt_varopts = FALSE)
+glimpse(dictionary)
+
+```
+### Save the data dictionary
+the data is saved to the RawData folder. 
+```{r save_data1, message = FALSE, warning = FALSE}
+write_csv(dictionary, here("RawData", "collected_data_dictionary.csv"))
+```
+
+## Append data dictionary to the collected_data_final file
+### Create main_string for attributes
+An introductory description for the data set is created to be added as meta data alongside the data dictionary below.
+```{r main_string}
+main_string <- "This data describes the NHS England Mortality data and running 5 years averages from the *NHSRdatasets* package collected by the data capture tool."
+main_string
+```
+### Incorporate attributes as metada
+```{r complete_dataset}
+complete_collected_data <- incorporate_attr(my.data = collected_data_final, data.dictionary = dictionary,
+                                           main_string = main_string)
+#Change the author name
+attributes(complete_collected_data)$author[1]<-"B210533"
+attributes(complete_collected_data)
+```
+### Save collected_data_final with attributes
+```{r save_it}
+save_it(complete_collected_data, here("RawData", "complete_collected_data"))
+```
+#### Save RDS
+```{r readRDS}
+complete_collected_data <- readRDS(here("RawData", "complete_collected_data.rds"))
 ```
 
